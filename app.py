@@ -1,17 +1,8 @@
 import pandas as pd
-import csv
-import datetime
-import logging
-
-# Load raw data
-FILE_PATH = 'https://raw.githubusercontent.com/gchandra10/filestorage/refs/heads/main/stock_market.csv'
-df = pd.read_csv(FILE_PATH)
-print(df.dtypes)
-# inspect shape
-print(df.shape)
-
-#preview starting rows
-print(df.head())
+import numpy as np
+# import csv
+# import datetime
+# import logging
 
 # convert headers to snake_case
 def dataframe_cleaning(df):
@@ -23,22 +14,73 @@ def dataframe_cleaning(df):
         df = df.rename(columns={orig_name: new_name})
         df[new_name] = df[new_name].str.strip() #strips whitespace from entire column
     return(df)
+    
+if __name__ == '__main__':
+    
+    # Load raw data
+    FILE_PATH = 'https://raw.githubusercontent.com/gchandra10/filestorage/refs/heads/main/stock_market.csv'
+    df = pd.read_csv(FILE_PATH)
+    print(df.dtypes)
 
+    # inspect shape
+    print(df.shape)
 
-df = dataframe_cleaning(df)
+    #preview starting rows
+    print(df.head())
 
-#standardize text case
+    #quick summary
+    print(df.describe())
 
-# change date format
-df['Trade_Date'] = pd.to_datetime(df['Trade_Date'])
-df['Trade_Date'] = df['Trade_Date'].dt.strftime('%Y-%m-%d')
-print(df)
-print(df.dtypes)
+    df = dataframe_cleaning(df)
 
-# TODO: cleaned parquet
-# df.to_parquet('cleaned.parquet')
+    #standardize text case for Validated
+    validated_mapping = {'N': 'No', 'NO' : 'No', 'No': 'No', 'Y': 'Yes', 'YES': 'Yes', 'Yes': 'Yes', 'n': 'No','y': 'Yes'}
+    df['Validated'] = df['Validated'].map(validated_mapping, na_action='ignore').fillna('NaN')
+    print(set(df['Validated']))
 
-# TODO: Aggregations
-# df.to_parquet('agg1.parquet')
-# df.to_parquet('agg2.parquet')
-# df.to_parquet('agg3.parquet')
+    #standardize text case for Currency
+    currency_mapping = {'USD': 'USD', 'usd': 'USD'}
+    df['Currency'] = df['Currency'].map(currency_mapping, na_action='ignore').fillna('NaN')
+    print(set(df['Currency']))
+
+    #standardize text case for Exchange
+    exchange_mapping = {'NASDAQ': 'NASDAQ', 'NYSE': 'NYSE'}
+    df['Exchange'] = df['Exchange'].map(exchange_mapping, na_action='ignore').fillna('NaN')
+    print(set(df['Exchange']))
+
+    # #standardize text case for Ticker
+    # print(set(df['Ticker']))
+    # ticker_mapping = {'AAPL': 'AAPL', 'AMZN': 'AMZN', 'GOOGL': 'GOOGL', 'META': 'META', 'MSFT': 'MSFT', 'NFLX': 'NFLX', 'NVDA': 'NVDA', 'TSLA': 'TSLA'}
+    # df['Ticker'] = df['Ticker'].map(ticker_mapping, na_action='ignore').fillna('')
+    allowed_tickers = ['AAPL', 'AMZN', 'GOOGL', 'META', 'MSFT', 'NFLX', 'NVDA', 'TSLA']
+    df['Ticker'] = df['Ticker'].where(df['Ticker'].isin(allowed_tickers))
+    print(set(df['Ticker']))
+
+    allowed_sectors = ['Automotive', 'Communication Services', 'Consumer Discretionary', 'Semiconductors', 'Technology']
+    df['Sector'] = df['Sector'].where(df['Sector'].isin(allowed_sectors))
+    print(set(df['Sector']))
+
+    #standardized casing for Notes
+    notes_mapping = {'EoD': 'EoD', 'gap down': 'Gap Down', 'gap up': 'Gap Up', 'pre-earnings': 'Pre-Earnings', 'rev miss': 'Rev Miss'}
+    df['Notes'] = df['Notes'].map(notes_mapping, na_action='ignore').fillna('NaN')
+    print(set(df['Notes']))
+
+    #Numeric column cleaning
+    numeric_columns = ['Open_Price', 'Close_Price', 'Volume']
+    for column in numeric_columns:
+        df[column] = pd.to_numeric(df[column], errors='coerce')
+    # df['Volume'] = pd.to_numeric(df['Volume'], downcast='integer', errors='coerce')
+
+    # change date format
+    df['Trade_Date'] = pd.to_datetime(df['Trade_Date'])
+    # df['Trade_Date'] = df['Trade_Date'].dt.strftime('%Y-%m-%d')
+    print(df)
+    print(df.dtypes)
+
+    # TODO: cleaned parquet
+    # df.to_parquet('cleaned.parquet')
+
+    # TODO: Aggregations
+    # df.to_parquet('agg1.parquet')
+    # df.to_parquet('agg2.parquet')
+    # df.to_parquet('agg3.parquet')
