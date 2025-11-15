@@ -1,11 +1,12 @@
 import pandas as pd
 import csv
+import datetime
 import logging
 
 # Load raw data
 FILE_PATH = 'https://raw.githubusercontent.com/gchandra10/filestorage/refs/heads/main/stock_market.csv'
 df = pd.read_csv(FILE_PATH)
-
+print(df.dtypes)
 # inspect shape
 print(df.shape)
 
@@ -21,9 +22,18 @@ def dataframe_cleaning(df):
         new_name = new_name.strip().replace(' ', '_') #stripped in case, then remove spaces with underscore
         df = df.rename(columns={orig_name: new_name})
         df[new_name] = df[new_name].str.strip() #strips whitespace from entire column
-    print(df.head())
+    return(df)
 
-dataframe_cleaning(df)
+
+df = dataframe_cleaning(df)
+
+#standardize text case
+
+# change date format
+df['Trade_Date'] = pd.to_datetime(df['Trade_Date'])
+df['Trade_Date'] = df['Trade_Date'].dt.strftime('%Y-%m-%d')
+print(df)
+print(df.dtypes)
 
 # TODO: cleaned parquet
 # df.to_parquet('cleaned.parquet')
