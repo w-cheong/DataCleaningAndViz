@@ -12,21 +12,18 @@ print(df.shape)
 #preview starting rows
 print(df.head())
 
-# summary
-
 # convert headers to snake_case
-def header_conversion():
+def dataframe_cleaning(df):
     headers = df.columns.values
     print(headers)
     for new_name in headers:
         orig_name = new_name
         new_name = new_name.strip().replace(' ', '_') #stripped in case, then remove spaces with underscore
         df = df.rename(columns={orig_name: new_name})
+        df[new_name] = df[new_name].str.strip() #strips whitespace from entire column
     print(df.head())
 
-header_conversion()
-
-# normalize schema
+dataframe_cleaning(df)
 
 # TODO: cleaned parquet
 # df.to_parquet('cleaned.parquet')
