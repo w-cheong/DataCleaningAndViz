@@ -10,13 +10,13 @@ This is my submission for the Data Cleaning & Viz assignment.
 - [x] row preview
 - [x] snake case
 - [x] trim whitespace
-- [ ] standardize text case
-- [ ] map items
-- [ ] define schema
-- [ ] parse dates
-- [ ] deduplicate row if needed
-- [ ] store cleaned.parquet
-- [ ] aggregations of cleaned.parquet
+- [X] standardize text case
+- [X] map items
+- [X] define schema
+- [X] parse dates
+- [X] deduplicate row if needed
+- [X] store cleaned.parquet
+- [X] aggregations of cleaned.parquet
 - [ ] Streamlit screenshots
 
 ---

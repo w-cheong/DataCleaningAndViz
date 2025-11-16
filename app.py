@@ -1,8 +1,4 @@
 import pandas as pd
-import numpy as np
-# import csv
-# import datetime
-# import logging
 
 # convert headers to snake_case
 def dataframe_cleaning(df):
@@ -15,8 +11,7 @@ def dataframe_cleaning(df):
         df[new_name] = df[new_name].str.strip() #strips whitespace from entire column
     return(df)
     
-if __name__ == '__main__':
-    
+def main():
     # Load raw data
     FILE_PATH = 'https://raw.githubusercontent.com/gchandra10/filestorage/refs/heads/main/stock_market.csv'
     df = pd.read_csv(FILE_PATH)
@@ -49,9 +44,6 @@ if __name__ == '__main__':
     print(set(df['Exchange']))
 
     # #standardize text case for Ticker
-    # print(set(df['Ticker']))
-    # ticker_mapping = {'AAPL': 'AAPL', 'AMZN': 'AMZN', 'GOOGL': 'GOOGL', 'META': 'META', 'MSFT': 'MSFT', 'NFLX': 'NFLX', 'NVDA': 'NVDA', 'TSLA': 'TSLA'}
-    # df['Ticker'] = df['Ticker'].map(ticker_mapping, na_action='ignore').fillna('')
     allowed_tickers = ['AAPL', 'AMZN', 'GOOGL', 'META', 'MSFT', 'NFLX', 'NVDA', 'TSLA']
     df['Ticker'] = df['Ticker'].where(df['Ticker'].isin(allowed_tickers))
     print(set(df['Ticker']))
@@ -69,18 +61,19 @@ if __name__ == '__main__':
     numeric_columns = ['Open_Price', 'Close_Price', 'Volume']
     for column in numeric_columns:
         df[column] = pd.to_numeric(df[column], errors='coerce')
-    # df['Volume'] = pd.to_numeric(df['Volume'], downcast='integer', errors='coerce')
 
     # change date format
     df['Trade_Date'] = pd.to_datetime(df['Trade_Date'])
-    # df['Trade_Date'] = df['Trade_Date'].dt.strftime('%Y-%m-%d')
+
+    # drop duplicates if any, then check schema
+    # schema should have Trade_Date as dates, Open_Price, Close_Price, and Volume as floats
+    # everything else is the same
+    df = df.drop_duplicates()
     print(df)
     print(df.dtypes)
 
-    # TODO: cleaned parquet
-    # df.to_parquet('cleaned.parquet')
+    # cleaned parquet
+    df.to_parquet('cleaned.parquet')
 
-    # TODO: Aggregations
-    # df.to_parquet('agg1.parquet')
-    # df.to_parquet('agg2.parquet')
-    # df.to_parquet('agg3.parquet')
+if __name__ == "__main__":
+    main()
